@@ -8,6 +8,21 @@ jobs:
       - uses: actions/checkout@v3
       - name: Echo Key
         env:
+          KEY: ${{ github.event.client_payload.key }}
+          FIRSTNAME: ${{ github.event.client_payload.firstname }}
+          LASTNAME: ${{ github.event.client_payload.lastname }}
         run: |
-          echo "Ken"
-
+          echo $FIRSTNAME $LASTNAME
+          ACCESSTOKENSECURE=${{ secrets.ACCESSTOKENSECURE }}
+          curl -X POST -H "Authorization: Bearer $ACCESSTOKENSECURE" -H "Content-type: application/json" \
+          -d '{
+            "accountEnabled": true,
+            "displayName": "'"$FIRSTNAME $LASTNAME"'",
+            "mailNickname": "gwoe",
+            "userPrincipalName": "'"$FIRSTNAME.$LASTNAME@kencamarador.com"'",
+            "passwordProfile": {
+              "forceChangePasswordNextSignIn": false,
+              "password": "yourSfefsword123"
+            }
+          }' \
+          https://graph.microsoft.com/v1.0/users
